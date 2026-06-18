@@ -64,10 +64,10 @@ public class StockageMySQL {
     }
     return null;
 }
-// Dans StockageMySQL.java - Déjà présent dans votre code
 
 
-// Dans StockageMySQL.java - À ajouter si non présent
+
+/
 
 public void saveEnseignant(Enseignant e) {
     String sql = "INSERT INTO enseignant (id, nom) VALUES (?,?) ON DUPLICATE KEY UPDATE nom=?";
@@ -82,15 +82,15 @@ public void saveEnseignant(Enseignant e) {
 }
 
 public void deleteEnseignant(int id) {
-    // Récupérer le nom avant suppression pour supprimer l'utilisateur
+    
     Enseignant e = getEnseignantById(id);
     if (e == null) return;
     
-    // Supprimer l'utilisateur associé
+    
     String nomUtilisateur = e.getNom().replaceAll("\\s+", "");
     supprimerUtilisateurEnseignant(nomUtilisateur);
     
-    // Supprimer l'enseignant
+    
     try (PreparedStatement ps = connexion.prepareStatement("DELETE FROM enseignant WHERE id = ?")) {
         ps.setInt(1, id);
         ps.executeUpdate();
@@ -116,7 +116,7 @@ public void creerUtilisateurEnseignant(String username, String password) {
         ps.setString(2, password);
         ps.executeUpdate();
     } catch (SQLException e) {
-        // Si l'utilisateur existe déjà, mettre à jour le mot de passe
+        
         if (e.getErrorCode() == 1062) {
             String updateSql = "UPDATE utilisateur SET mot_de_passe = ? WHERE nom = ? AND role = 'ENSEIGNANT'";
             try (PreparedStatement updatePs = connexion.prepareStatement(updateSql)) {
@@ -194,7 +194,6 @@ public void creerUtilisateurEnseignant(String username, String password) {
     }
 
     
-    // ========== METHODES ETUDIANTS ==========
     public List<Etudiant> getAllEtudiants() {
     List<Etudiant> list = new ArrayList<>();
     try (Statement stmt = connexion.createStatement();
@@ -231,13 +230,13 @@ public void creerUtilisateurEnseignant(String username, String password) {
     return null;
 }
 public void creerUtilisateurEtudiant(String username, String password, String nomComplet) {
-    // Vérifier si l'utilisateur existe déjà
+    
     String checkSql = "SELECT id FROM utilisateur WHERE nom = ?";
     try (PreparedStatement checkPs = connexion.prepareStatement(checkSql)) {
         checkPs.setString(1, username);
         ResultSet rs = checkPs.executeQuery();
         if (rs.next()) {
-            // Mettre à jour le mot de passe si l'utilisateur existe
+            
             String updateSql = "UPDATE utilisateur SET mot_de_passe = ? WHERE nom = ?";
             try (PreparedStatement updatePs = connexion.prepareStatement(updateSql)) {
                 updatePs.setString(1, password);
@@ -251,7 +250,7 @@ public void creerUtilisateurEtudiant(String username, String password, String no
         e.printStackTrace();
     }
     
-    // Créer le nouvel utilisateur
+    
     String sql = "INSERT INTO utilisateur (nom, mot_de_passe, role, filiere) VALUES (?, ?, 'ETUDIANT', NULL)";
     try (PreparedStatement ps = connexion.prepareStatement(sql)) {
         ps.setString(1, username);
@@ -312,25 +311,25 @@ public void supprimerUtilisateur(String username) {
         Etudiant et = getEtudiantById(id);
         if (et == null) return;
         
-        // 1. Delete notes
+        
         try (PreparedStatement ps = connexion.prepareStatement("DELETE FROM note WHERE etudiant_id = ?")) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
         
-        // 2. Delete validations
+        
         try (PreparedStatement ps = connexion.prepareStatement("DELETE FROM validation_promotion WHERE etudiant_id = ?")) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (SQLException e) { e.printStackTrace(); }
         
-        // 3. Delete utilisateur account
+        
         supprimerUtilisateur(et.getNumEtudiant());
         supprimerUtilisateur(et.getPrenom() + et.getNom());
         supprimerUtilisateur(et.getNom().replaceAll("\\s+", "") + et.getPrenom().replaceAll("\\s+", ""));
         supprimerUtilisateur(et.getPrenom().replaceAll("\\s+", "") + et.getNom().replaceAll("\\s+", ""));
         
-        // 4. Delete etudiant
+        
         try (PreparedStatement ps = connexion.prepareStatement("DELETE FROM etudiant WHERE id = ?")) {
             ps.setInt(1, id);
             ps.executeUpdate();
@@ -356,7 +355,6 @@ public void supprimerUtilisateur(String username) {
         return list;
     }
 
-    // ========== METHODES PROMOTIONS ==========
     public List<Promotion> getAllPromotions() {
         List<Promotion> list = new ArrayList<>();
         try (Statement stmt = connexion.createStatement();
@@ -408,7 +406,7 @@ public void supprimerUtilisateur(String username) {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    // ========== METHODES MODULES ==========
+    //  METHODES MODULES 
     public List<Module> getAllModules() {
         List<Module> list = new ArrayList<>();
         try (Statement stmt = connexion.createStatement();
@@ -450,7 +448,7 @@ public void supprimerUtilisateur(String username) {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    // ========== METHODES SOUS-MODULES ==========
+    //  METHODES SOUS-MODULES 
     public List<SousModule> getAllSousModules() {
         List<SousModule> list = new ArrayList<>();
         try (Statement stmt = connexion.createStatement();
@@ -608,7 +606,7 @@ public void supprimerUtilisateur(String username) {
         return totalCoef == 0 ? -1 : somme / totalCoef;
     }
 
-    // ========== METHODES VALIDATION ==========
+    //  METHODES VALIDATION 
     public void marquerValidation(int etudiantId, int promotionId, boolean valide) {
         String sql = "INSERT INTO validation_promotion (etudiant_id, promotion_id, valide) VALUES (?,?,?) ON DUPLICATE KEY UPDATE valide=?";
         try (PreparedStatement ps = connexion.prepareStatement(sql)) {

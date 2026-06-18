@@ -42,7 +42,7 @@ public class InterfaceFx extends Application {
     private boolean hasUnsavedChanges = false;
     private String filiereResponsable;
     
-    // ==================== COULEURS THEME DARK PREMIUM ====================
+    //  COULEURS THEME DARK PREMIUM 
     private static final String BG_PRIMARY = "#0F0F17";
     private static final String BG_SECONDARY = "#161622";
     private static final String BG_CARD = "#1E1E2E";
@@ -72,7 +72,7 @@ public class InterfaceFx extends Application {
         afficherConnexion();
     }
     
-    // ==================== MÉTHODE UTILITAIRE POUR COMBOBOX STYLISÉ ====================
+    //  MÉTHODE UTILITAIRE POUR COMBOBOX STYLISÉ 
     private <T> ComboBox<T> createStyledComboBox(ObservableList<T> items) {
         ComboBox<T> comboBox = new ComboBox<>(items);
         comboBox.setStyle("-fx-background-color: " + BG_CARD + ";-fx-text-fill: " + TEXT_PRIMARY + ";-fx-background-radius: 8;-fx-padding: 8 12 8 12;");
@@ -114,7 +114,7 @@ public class InterfaceFx extends Application {
     return FXCollections.observableArrayList(list);
 }
     
-    // ==================== FENÊTRE DE CONNEXION ====================
+    //  FENÊTRE DE CONNEXION 
     private void afficherConnexion() {
         BorderPane mainPane = new BorderPane();
         mainPane.setStyle("-fx-background-color: " + BG_PRIMARY + ";");
@@ -212,7 +212,7 @@ public class InterfaceFx extends Application {
         });
     }
     
-    // ==================== INTERFACE PRINCIPALE ====================
+    //  INTERFACE PRINCIPALE 
     private void initInterface() {
         root = new BorderPane();
         root.setStyle("-fx-background-color: " + BG_PRIMARY + ";");
@@ -431,7 +431,7 @@ private boolean isValidEmail(String email) {
     String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
     return email.matches(regex);
 }
-    // ==================== PANNEAU ÉTUDIANTS ====================
+    //  PANNEAU ÉTUDIANTS 
     private Node panneauEtudiants() {
         
         
@@ -801,7 +801,7 @@ private boolean isValidEmail(String email) {
         return null;
     });
     
-    // ===== PARTIE MODIFIÉE =====
+    //  PARTIE MODIFIÉE 
     dialog.showAndWait().ifPresent(et -> {
         // Sauvegarder l'étudiant dans la base
         db.saveEtudiant(et);
@@ -850,7 +850,7 @@ private boolean isValidEmail(String email) {
         return panel;
     }
 
-    // ==================== PANNEAU ÉTUDIANTS ARCHIVES ====================
+    //  PANNEAU ÉTUDIANTS ARCHIVES 
 private Node panneauEtudiantsArchives() {
     VBox panel = createStyledPanel("📦 Étudiants archivés");
     
@@ -1170,7 +1170,7 @@ private Node panneauEnseignants() {
     return panel;
 }
     
-    // ==================== PANNEAU PROMOTIONS ====================
+    //  PANNEAU PROMOTIONS 
     private Node panneauPromotions() {
         VBox panel = createStyledPanel("🏫 Gestion des promotions");
         
@@ -1340,7 +1340,7 @@ private Node panneauEnseignants() {
         return panel;
     }
     
-    // ==================== PANNEAU MODULES ====================
+    //  PANNEAU MODULES 
     private Node panneauModules() {
         VBox panel = createStyledPanel("📚 Gestion des modules");
         
@@ -1416,7 +1416,7 @@ private Node panneauEnseignants() {
         TitledPane tpSousModules = new TitledPane("📄 Sous-modules", sousModulesBox);
         accordion.getPanes().addAll(tpModules, tpSousModules);
         
-        // ========== ACTIONS MODULES ==========
+        //  ACTIONS MODULES 
         btnAjouterModule.setOnAction(e -> {
             Dialog<Module> dialog = new Dialog<>();
             dialog.setTitle("Ajouter un module");
@@ -1524,7 +1524,7 @@ private Node panneauEnseignants() {
             sousModulesData.setAll(db.getAllSousModules());
         });
         
-        // ========== ACTIONS SOUS-MODULES ==========
+        //  ACTIONS SOUS-MODULES 
         btnAjouterSM.setOnAction(e -> {
             if (db.getAllModules().isEmpty() || db.getAllPromotions().isEmpty()) {
                 showAlert("Information", "Veuillez d'abord créer des modules et des promotions", Alert.AlertType.WARNING);
@@ -1701,7 +1701,7 @@ private Node panneauEnseignants() {
         return panel;
     }
     
-    // ==================== PANNEAU SAISIE NOTES ====================
+    //  PANNEAU SAISIE NOTES 
     private Node panneauSaisieNotes() {
         VBox panel = createStyledPanel("📝 Saisie des notes");
         
@@ -1961,7 +1961,7 @@ private Node panneauEnseignants() {
         return panel;
     }
     
-    // ==================== PANNEAU NOTES ÉTUDIANT ====================
+    //  PANNEAU NOTES ÉTUDIANT 
     private Node panneauNotesEtudiant() {
         VBox panel = createStyledPanel("📖 Mes notes");
         
@@ -2084,7 +2084,7 @@ private Node panneauEnseignants() {
         return panel;
     }
     
-    // ==================== PANNEAU VALIDATION ANNÉE ====================
+    //  PANNEAU VALIDATION ANNÉE 
     private Node panneauValidationAnnee() {
         VBox panel = createStyledPanel("✅ Validation de l'année - Règlement d'évaluation");
         
@@ -2207,7 +2207,7 @@ private Node panneauEnseignants() {
         return panel;
     }
     
-    // ==================== PANNEAU STATISTIQUES ====================
+    //  PANNEAU STATISTIQUES 
     private Node panneauStatistiques() {
         VBox panel = createStyledPanel("📊 Statistiques et rapports");
         
@@ -2374,7 +2374,7 @@ private Node panneauEnseignants() {
         return panel;
     }
     
-    // ==================== PANNEAU NOTES PAR CLASSE ====================
+    //  PANNEAU NOTES PAR CLASSE 
     private Node panneauNotesClasse() {
         VBox panel = createStyledPanel("📊 Tableau récapitulatif des notes par classe");
         
@@ -2469,7 +2469,7 @@ private Node panneauEnseignants() {
         return panel;
     }
     
-    // ==================== PANNEAU PROGRESSION ÉTUDIANT ====================
+    //  PANNEAU PROGRESSION ÉTUDIANT 
     private Node panneauProgressionEtudiant() {
         VBox panel = createStyledPanel("📊 Ma progression académique");
         
@@ -2540,7 +2540,7 @@ private Node panneauEnseignants() {
         return panel;
     }
     
-    // ==================== IMPORT/EXPORT ====================
+    //  IMPORT/EXPORT 
     
     private void importerNotesExcel(ObservableList<NoteTableRow> data, SousModule sm) {
         if (sm == null) {
@@ -2688,7 +2688,7 @@ private Node panneauEnseignants() {
         }
     }
     
-    // ==================== MÉTHODES UTILITAIRES ====================
+    //  MÉTHODES UTILITAIRES 
     private void updateLampeIndicateur() {
         if (lampeIndicateur != null) {
             if (hasUnsavedChanges) {
@@ -2732,7 +2732,7 @@ private Node panneauEnseignants() {
         return btn;
     }
     
-    // ==================== CLASSES INTERNES ====================
+    //  CLASSES INTERNES 
     public static class NoteTableRow {
         private final int id;
         private final String etudiantNom;
