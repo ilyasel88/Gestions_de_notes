@@ -67,7 +67,7 @@ public class StockageMySQL {
 
 
 
-/
+
 
 public void saveEnseignant(Enseignant e) {
     String sql = "INSERT INTO enseignant (id, nom) VALUES (?,?) ON DUPLICATE KEY UPDATE nom=?";

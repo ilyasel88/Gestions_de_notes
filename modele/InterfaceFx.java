@@ -37,7 +37,6 @@ public class InterfaceFx extends Application {
     
     private Stage primaryStage;
     private BorderPane root;
-    // Indicateur de modification
     private Label lampeIndicateur;
     private boolean hasUnsavedChanges = false;
     private String filiereResponsable;
@@ -72,7 +71,7 @@ public class InterfaceFx extends Application {
         afficherConnexion();
     }
     
-    //  MÉTHODE UTILITAIRE POUR COMBOBOX STYLISÉ 
+    
     private <T> ComboBox<T> createStyledComboBox(ObservableList<T> items) {
         ComboBox<T> comboBox = new ComboBox<>(items);
         comboBox.setStyle("-fx-background-color: " + BG_CARD + ";-fx-text-fill: " + TEXT_PRIMARY + ";-fx-background-radius: 8;-fx-padding: 8 12 8 12;");
@@ -382,7 +381,7 @@ public class InterfaceFx extends Application {
     private boolean isValidNumEtudiant(String num) {
     if (num == null || num.length() != 4) return false;
     char firstChar = num.charAt(0);
-    if (firstChar < 'A' || firstChar > 'Z') return false;  // Uniquement A-Z majuscules
+    if (firstChar < 'A' || firstChar > 'Z') return false;  
     for (int i = 1; i < 4; i++) {
         if (!Character.isDigit(num.charAt(i))) return false;
     }
@@ -390,7 +389,7 @@ public class InterfaceFx extends Application {
 }
 
 private boolean isValidDateNaissance(String date) {
-    if (date == null || date.isEmpty()) return false;  // Plus optionnel, devient obligatoire
+    if (date == null || date.isEmpty()) return false;  
     if (!date.matches("\\d{2}/\\d{2}/\\d{4}")) return false;
     
     String[] parts = date.split("/");
@@ -398,13 +397,13 @@ private boolean isValidDateNaissance(String date) {
     int mois = Integer.parseInt(parts[1]);
     int annee = Integer.parseInt(parts[2]);
     
-    // Vérifier que l'année est cohérente (entre 1920 et 2008)
+    
     if (annee < 1920 || annee > 2008) return false;
     
-    // Vérifier le mois
+    
     if (mois < 1 || mois > 12) return false;
     
-    // Vérifier le jour selon le mois
+    
     int maxJours;
     if (mois == 2) {
         boolean bissextile = (annee % 4 == 0 && annee % 100 != 0) || (annee % 400 == 0);
@@ -418,16 +417,16 @@ private boolean isValidDateNaissance(String date) {
     return jour >= 1 && jour <= maxJours;
 }
 
-// Validation du téléphone marocain
+
 private boolean isValidTelephone(String tel) {
-    if (tel == null || tel.isEmpty()) return true; // Optionnel
-    // Format: 06XXXXXXXX ou 07XXXXXXXX ou 05XXXXXXXX
+    if (tel == null || tel.isEmpty()) return true; 
+   
     return tel.matches("^(06|07|05)\\d{8}$");
 }
 
-// Validation de l'email
+
 private boolean isValidEmail(String email) {
-    if (email == null || email.isEmpty()) return true; // Optionnel
+    if (email == null || email.isEmpty()) return true; 
     String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
     return email.matches(regex);
 }
@@ -440,7 +439,7 @@ private boolean isValidEmail(String email) {
 
         VBox panel = createStyledPanel("👨‍🎓 Gestion des étudiants");
         
-        // Sélecteur de promotion
+        
         HBox selectorBox = new HBox(10);
         selectorBox.setAlignment(Pos.CENTER_LEFT);
         selectorBox.setPadding(new Insets(0, 0, 15, 0));
@@ -535,7 +534,7 @@ private boolean isValidEmail(String email) {
         return;
     }
     
-    // Stocker l'ancien numéro et l'ancienne date pour la mise à jour de l'utilisateur
+    
     final String ancienNum = selected.getNumEtudiant();
     final String ancienneDate = selected.getDateNaissance();
     
@@ -643,23 +642,23 @@ private boolean isValidEmail(String email) {
     });
     
     dialog.showAndWait().ifPresent(et -> {
-        // Sauvegarder l'étudiant dans la base
+        
         db.saveEtudiant(et);
         
-        // Vérifier si le numéro ou la date a changé pour mettre à jour l'utilisateur
+        
         boolean numChanged = !ancienNum.equals(et.getNumEtudiant());
         boolean dateChanged = !ancienneDate.equals(et.getDateNaissance());
         
         if (numChanged || dateChanged) {
-            // Générer le nouveau mot de passe: nom + prenom + dateNaissance sans /
+           
             String mdpUtilisateur = et.getNom().toLowerCase() + et.getPrenom().toLowerCase() + et.getDateNaissance().replace("/", "");
             
-            // Si le numéro a changé, supprimer l'ancien utilisateur
+           
             if (numChanged) {
                 db.supprimerUtilisateur(ancienNum);
             }
             
-            // Créer ou mettre à jour l'utilisateur
+            
             db.creerUtilisateurEtudiant(et.getNumEtudiant(), mdpUtilisateur, et.getPrenom() + " " + et.getNom());
             
             showAlert("Succès", "✅ Étudiant modifié\n🔑 Identifiants mis à jour:\nUtilisateur: " + et.getNumEtudiant() + "\nMot de passe: " + mdpUtilisateur, Alert.AlertType.INFORMATION);
@@ -677,7 +676,7 @@ private boolean isValidEmail(String email) {
     });
 });
         
-        // Charger les étudiants de la promotion sélectionnée
+       
         btnCharger.setOnAction(e -> {
             Promotion p = comboPromo.getValue();
             if (p == null) {
@@ -690,7 +689,7 @@ private boolean isValidEmail(String email) {
             }
         });
         
-        // Ajouter un étudiant (directement à la promotion sélectionnée)
+        
         btnAjouter.setOnAction(e -> {
     Promotion p = comboPromo.getValue();
     if (p == null) {
@@ -801,26 +800,25 @@ private boolean isValidEmail(String email) {
         return null;
     });
     
-    //  PARTIE MODIFIÉE 
     dialog.showAndWait().ifPresent(et -> {
-        // Sauvegarder l'étudiant dans la base
+        
         db.saveEtudiant(et);
         
-        // Nom d'utilisateur = numéro étudiant
+      
         String nomUtilisateur = et.getNumEtudiant();
-        // Mot de passe = nom + prenom + dateNaissance (sans /, en minuscules)
+       
         String mdpUtilisateur = et.getNom().toLowerCase() + et.getPrenom().toLowerCase() + et.getDateNaissance().replace("/", "");
         
-        // Créer l'utilisateur dans la table utilisateur
+
         db.creerUtilisateurEtudiant(nomUtilisateur, mdpUtilisateur, et.getPrenom() + " " + et.getNom());
         
-        // Recharger la liste des étudiants
+       
         Promotion promo = comboPromo.getValue();
         if (promo != null) {
             data.setAll(db.getEtudiantsByPromotion(promo.getId()));
         }
         
-        // Afficher le message de succès avec les identifiants
+       
         showAlert("Succès", "✅ Étudiant ajouté\n\n🔑 Identifiants de connexion :\nUtilisateur: " + nomUtilisateur + "\nMot de passe: " + mdpUtilisateur, Alert.AlertType.INFORMATION);
     });
     
@@ -854,7 +852,7 @@ private boolean isValidEmail(String email) {
 private Node panneauEtudiantsArchives() {
     VBox panel = createStyledPanel("📦 Étudiants archivés");
     
-    // Sélecteur de promotion
+    
     HBox selectorBox = new HBox(10);
     selectorBox.setAlignment(Pos.CENTER_LEFT);
     selectorBox.setPadding(new Insets(0, 0, 15, 0));
@@ -869,7 +867,7 @@ private Node panneauEtudiantsArchives() {
     
     selectorBox.getChildren().addAll(selectPromoLabel, comboPromo, btnCharger);
     
-    // Tableau des étudiants archivés
+    
     TableView<Etudiant> table = new TableView<>();
     
     
@@ -906,7 +904,7 @@ private Node panneauEtudiantsArchives() {
     ObservableList<Etudiant> data = FXCollections.observableArrayList();
     table.setItems(data);
     
-    // Bouton pour restaurer un étudiant
+    
     HBox boutons = new HBox(10);
     boutons.setAlignment(Pos.CENTER_LEFT);
     boutons.setPadding(new Insets(10, 0, 10, 0));
@@ -973,7 +971,7 @@ private Node panneauEtudiantsArchives() {
                 if (p != null) {
                     data.setAll(db.getEtudiantsByPromotion(p.getId()));
                 }
-                // Rafraîchir aussi le panneau des étudiants actifs
+               
                 refreshEtudiantsPanel();
                 showAlert("Succès", "✅ Étudiant restauré avec succès !", Alert.AlertType.INFORMATION);
                 btnCharger.fire();
@@ -993,7 +991,7 @@ private void refreshEtudiantsPanel() {
 
 }
 
-// À ajouter dans InterfaceFx.java
+
 
 private Node panneauEnseignants() {
     VBox panel = createStyledPanel("👨‍🏫 Gestion des enseignants");
@@ -1739,7 +1737,7 @@ private Node panneauEnseignants() {
         colNoteRattrapage.setPrefWidth(120);
         colNoteRattrapage.setEditable(true);
         
-        // Factory that works for both Note and NoteRattrapage, handles negative values as empty
+        
         javafx.util.Callback<TableColumn<NoteTableRow, Double>, TableCell<NoteTableRow, Double>> cellFactory = tc -> new TableCell<NoteTableRow, Double>() {
             private TextField textField;
             
@@ -1769,7 +1767,7 @@ private Node panneauEnseignants() {
                 if (row != null) {
                     if (tc.getText().startsWith("Note")) {
                         row.setNote(newValue);
-                        // Si la note devient >= 11, on annule l'éventuel rattrapage
+                         
                         if (newValue >= 11 && row.getNoteRattrapage() != -1) {
                             row.setNoteRattrapage(-1);
                         }
@@ -1781,7 +1779,7 @@ private Node panneauEnseignants() {
                         updateLampeIndicateur();
                     }
                     
-                    // Forcer le rafraîchissement visuel de toute la ligne (pour mettre à jour l'autre colonne instantanément)
+                 
                     javafx.application.Platform.runLater(() -> getTableView().refresh());
                 }
             }
@@ -1859,7 +1857,7 @@ private Node panneauEnseignants() {
         ObservableList<NoteTableRow> data = FXCollections.observableArrayList();
         table.setItems(data);
         
-        // Panneau supérieur avec sélecteur et bouton charger
+      
         HBox topBox = new HBox(10);
         topBox.setAlignment(Pos.CENTER_LEFT);
         Label selectLabel = new Label("📌 Sous-module:");
@@ -1868,12 +1866,12 @@ private Node panneauEnseignants() {
         topBox.getChildren().addAll(selectLabel, comboModule, btnCharger);
         topBox.setPadding(new Insets(0, 0, 15, 0));
         
-        // Panneau des boutons avec indicateur
+       
         HBox bottomBox = new HBox(15);
         bottomBox.setAlignment(Pos.CENTER_LEFT);
         bottomBox.setPadding(new Insets(15, 0, 0, 0));
         
-        // Lampe indicateur
+       
         lampeIndicateur = new Label("●");
         lampeIndicateur.setFont(Font.font("Segoe UI", 20));
         lampeIndicateur.setTextFill(Color.web(COLOR_DANGER));
@@ -1891,10 +1889,10 @@ private Node panneauEnseignants() {
         
         bottomBox.getChildren().addAll(lampeBox, btnEnregistrer, btnImporterExcel, btnExporterExcel);
         
-        // Initialiser l'indicateur
+        
         updateLampeIndicateur();
         
-        // Charger les étudiants
+        
         btnCharger.setOnAction(e -> {
             SousModule sm = comboModule.getValue();
             if (sm == null) {
@@ -2135,7 +2133,7 @@ private Node panneauEnseignants() {
     data.clear();
     List<Module> modules = db.getAllModules();
     for (Etudiant et : db.getEtudiantsByPromotion(p.getId())) {
-        if (!et.isArchive()) {  // AJOUTEZ CETTE CONDITION
+        if (!et.isArchive()) {  
             ReglementEvaluation.ResultatValidation result = ReglementEvaluation.validerAnnee(et, modules, db);
             
             boolean dejaValide = db.isValidationExistante(et.getId(), p.getId());
@@ -2300,7 +2298,7 @@ private Node panneauEnseignants() {
             HBox valBox = new HBox(15, valTable, nonValTable);
             valBox.setAlignment(Pos.CENTER_LEFT);
             
-            // ---------------- CHARTS ---------------- //
+          
             ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList(
                 new PieChart.Data("Validés", validesData.size()),
                 new PieChart.Data("Non Validés", nonValidesData.size())
