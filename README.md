@@ -12,7 +12,7 @@ Ce projet est un système complet de gestion académique permettant de gérer le
 
 ## Fonctionnalités
 
-### Rôles utilisateurs
+## Rôles utilisateurs
 | Rôle | Accès |
 |---|---|
 | `PLANNING` | Gestion complète : étudiants, promotions, modules, enseignants |
