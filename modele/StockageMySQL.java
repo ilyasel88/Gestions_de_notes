@@ -133,9 +133,10 @@ public void creerUtilisateurEnseignant(String username, String password) {
 }
     
     public Enseignant getEnseignantParNom(String nom) {
-        String sql = "SELECT * FROM enseignant WHERE nom = ?";
+        String sql = "SELECT * FROM enseignant WHERE nom = ? OR REPLACE(nom, ' ', '') = ?";
         try (PreparedStatement ps = connexion.prepareStatement(sql)) {
             ps.setString(1, nom);
+            ps.setString(2, nom);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return new Enseignant(rs.getInt("id"), rs.getString("nom"));

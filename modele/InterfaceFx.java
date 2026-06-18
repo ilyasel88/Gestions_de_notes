@@ -1723,9 +1723,13 @@ private Node panneauEnseignants() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colId.setPrefWidth(60);
         
-        TableColumn<NoteTableRow, String> colEtudiant = new TableColumn<>("Étudiant");
-        colEtudiant.setCellValueFactory(new PropertyValueFactory<>("etudiantNom"));
-        colEtudiant.setPrefWidth(300);
+        TableColumn<NoteTableRow, String> colNom = new TableColumn<>("Nom");
+        colNom.setCellValueFactory(new PropertyValueFactory<>("etudiantNom"));
+        colNom.setPrefWidth(150);
+        
+        TableColumn<NoteTableRow, String> colPrenom = new TableColumn<>("Prénom");
+        colPrenom.setCellValueFactory(new PropertyValueFactory<>("etudiantPrenom"));
+        colPrenom.setPrefWidth(150);
         
         TableColumn<NoteTableRow, Double> colNote = new TableColumn<>("Note /20");
         colNote.setCellValueFactory(new PropertyValueFactory<>("note"));
@@ -1851,7 +1855,7 @@ private Node panneauEnseignants() {
         colNote.setCellFactory(cellFactory);
         colNoteRattrapage.setCellFactory(cellFactory);
         
-        table.getColumns().addAll(colId, colEtudiant, colNote, colNoteRattrapage);
+        table.getColumns().addAll(colId, colNom, colPrenom, colNote, colNoteRattrapage);
         table.setEditable(true);
         
         ObservableList<NoteTableRow> data = FXCollections.observableArrayList();
@@ -1911,7 +1915,7 @@ private Node panneauEnseignants() {
                         break;
                     }
                 }
-                data.add(new NoteTableRow(et.getId(), et.getPrenom() + " " + et.getNom(), noteExistante, rattrapageExistant));
+                data.add(new NoteTableRow(et.getId(), et.getNom(), et.getPrenom(), noteExistante, rattrapageExistant));
                 }
             }
             hasUnsavedChanges = false;
@@ -2562,8 +2566,8 @@ private Node panneauEnseignants() {
                     if (row.getRowNum() == 0) continue;
                     
                     String nomEtudiant = "";
-                    double note = -1;
-                    double rattrapage = -1;
+                    double note = -2;
+                    double rattrapage = -2;
                     
                     org.apache.poi.ss.usermodel.Cell nomCell = row.getCell(0);
                     if (nomCell != null) {
@@ -2579,7 +2583,9 @@ private Node panneauEnseignants() {
                         if (noteCell.getCellType() == org.apache.poi.ss.usermodel.CellType.NUMERIC) {
                             note = noteCell.getNumericCellValue();
                         } else if (noteCell.getCellType() == org.apache.poi.ss.usermodel.CellType.STRING) {
-                            try { note = Double.parseDouble(noteCell.getStringCellValue()); } catch (NumberFormatException ignored) {}
+                            String str = noteCell.getStringCellValue().trim();
+                            if (str.equalsIgnoreCase("absent") || str.equals("-")) note = -1;
+                            else try { note = Double.parseDouble(str); } catch (NumberFormatException ignored) {}
                         }
                     }
                     
@@ -2588,17 +2594,34 @@ private Node panneauEnseignants() {
                         if (rattrapageCell.getCellType() == org.apache.poi.ss.usermodel.CellType.NUMERIC) {
                             rattrapage = rattrapageCell.getNumericCellValue();
                         } else if (rattrapageCell.getCellType() == org.apache.poi.ss.usermodel.CellType.STRING) {
-                            try { rattrapage = Double.parseDouble(rattrapageCell.getStringCellValue()); } catch (NumberFormatException ignored) {}
+                            String str = rattrapageCell.getStringCellValue().trim();
+                            if (str.equalsIgnoreCase("absent") || str.equals("-")) rattrapage = -1;
+                            else try { rattrapage = Double.parseDouble(str); } catch (NumberFormatException ignored) {}
                         }
                     }
                     
+                    String pNom = nomEtudiant;
+                    String pPrenom = "";
+                    if (nomEtudiant.contains(" ")) {
+                        String[] parts = nomEtudiant.split(" ", 2);
+                        pNom = parts[0];
+                        pPrenom = parts[1];
+                    }
+                    
                     for (NoteTableRow noteRow : data) {
-                        if (noteRow.getEtudiantNom().equalsIgnoreCase(nomEtudiant)) {
-                            if (note >= 0) {
+                        boolean match = false;
+                        if (pPrenom.isEmpty()) {
+                            match = noteRow.getEtudiantNom().equalsIgnoreCase(pNom) || noteRow.getEtudiantPrenom().equalsIgnoreCase(pNom);
+                        } else {
+                            match = noteRow.getEtudiantNom().equalsIgnoreCase(pNom) && noteRow.getEtudiantPrenom().equalsIgnoreCase(pPrenom);
+                        }
+                        
+                        if (match) {
+                            if (note >= -1) {
                                 noteRow.setNote(note);
                                 if (note >= 11) noteRow.setNoteRattrapage(-1);
                             }
-                            if (rattrapage >= 0 && noteRow.getNote() < 11) {
+                            if (rattrapage >= -1 && noteRow.getNote() < 11) {
                                 noteRow.setNoteRattrapage(rattrapage);
                             }
                             Etudiant et = db.getEtudiantById(noteRow.getId());
@@ -2655,9 +2678,12 @@ private Node panneauEnseignants() {
                 int rowNum = 1;
                 for (NoteTableRow row : data) {
                     org.apache.poi.ss.usermodel.Row excelRow = sheet.createRow(rowNum++);
-                    excelRow.createCell(0).setCellValue(row.getEtudiantNom());
+                    excelRow.createCell(0).setCellValue(row.getEtudiantNom() + " " + row.getEtudiantPrenom());
                     if (row.getNote() >= 0) excelRow.createCell(1).setCellValue(row.getNote());
+                    else if (row.getNote() == -1) excelRow.createCell(1).setCellValue("-");
+                    
                     if (row.getNoteRattrapage() >= 0) excelRow.createCell(2).setCellValue(row.getNoteRattrapage());
+                    else if (row.getNoteRattrapage() == -1 && row.getNote() < 11) excelRow.createCell(2).setCellValue("-");
                 }
                 
                 sheet.autoSizeColumn(0);
@@ -2734,17 +2760,20 @@ private Node panneauEnseignants() {
     public static class NoteTableRow {
         private final int id;
         private final String etudiantNom;
+        private final String etudiantPrenom;
         private double note;
         private double noteRattrapage;
         
-        public NoteTableRow(int id, String etudiantNom, double note, double noteRattrapage) {
+        public NoteTableRow(int id, String etudiantNom, String etudiantPrenom, double note, double noteRattrapage) {
             this.id = id;
             this.etudiantNom = etudiantNom;
+            this.etudiantPrenom = etudiantPrenom;
             this.note = note;
             this.noteRattrapage = noteRattrapage;
         }
         public int getId() { return id; }
         public String getEtudiantNom() { return etudiantNom; }
+        public String getEtudiantPrenom() { return etudiantPrenom; }
         public double getNote() { return note; }
         public void setNote(double note) { this.note = note; }
         public double getNoteRattrapage() { return noteRattrapage; }
